@@ -1,0 +1,8 @@
+<h3>Hey <%= current_user.name %>! Check out who else has registered on this app: </h3><hr>
+<ol>
+  <% @users.each do |user| %>
+    <div class="users_list">
+      <li><a href="/users/<%= user.id %>"><%= user.name %></a> who joined this app <%= user.created_at.strftime("%H hours and %M minutes ago") %>!</li>
+    </div>
+  <% end %>
+</ol>
