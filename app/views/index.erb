@@ -1,6 +1,16 @@
-<div class="container">
+<% if current_user %>
+    <h3>Hey <%= current_user.name %>! Check out who else has registered on this app: </h3><hr>
+  <ol>
+    <% @users.each do |user| %>
+      <div class="users_list">
+        <li><a href="/users/<%= user.id %>"><%= user.name %></a> who joined this app <%= user.created_at.strftime("on %D") %>!</li>
+      </div>
+    <% end %>
+  </ol>
+<% else %>
+  <center>
+  <h1>Welcome to my Authentication App</h1>
+  This app demonstrates how you can implement user login and authentication.
+  </center>
+<% end %>
 
-  <%# TODO: 
-  1. If user is not signed in - display "Welcome".
-  2. If user is signed in then  display all users %>
-</div>
