@@ -14,22 +14,28 @@ end
 post '/sessions' do
   # sign-in
   @user = User.find_by_email(params[:email])
-  puts "="*80
-  p @user
-  p "@user.password: #{@user.password}"
-  p "params[:password] : #{params[:password]}"
-  puts "*"*50
-  if @user
-    if @user.password == params[:password_hash]
-      session[:user_id] = @user.id
-    end
+  if @user.password_hash == BCrypt::Engine.hash_secret(params[:password_hash], @user.password_salt)
+    session[:user_id] = @user.id
   end
-  redirect "/"
+  redirect '/'
 end
+
+# From old version of Bcrypt. Doesnt work
+# post '/sessions' do
+#   # sign-in
+#   @user = User.find_by_email(params[:email])
+#   puts "*"*50
+#   if @user
+#     if @user.password == params[:password_hash]
+#       session[:user_id] = @user.id
+#     end
+#   end
+#   redirect "/"
+# end
 
 delete '/sessions/:id' do
   # sign-out -- invoked via AJAX
-  session[:user_id] = nil
+  session.clear
   redirect to '/'
 end
 
@@ -42,9 +48,23 @@ end
 
 post '/users' do
   # sign-up a new user
-  @user = User.new(params[:user])
-  @user.password = params[:password]
-  @user.save!
+  password_salt = BCrypt::Engine.generate_salt
+  password_hash = BCrypt::Engine.hash_secret(params[:password], password_salt)
+  @user = User.create(
+    email: params[:email],
+    name: params[:name], 
+    password_hash: password_hash,
+    password_salt: password_salt)
   session[:user_id] = @user.id
-  redirect to '/'
+  redirect '/'
 end
+
+# From old version of Bcrypt. Doesnt work
+# post '/users' do
+#   # sign-up a new user
+#   @user = User.new(params[:user])
+#   @user.password = params[:password]
+#   @user.save!
+#   session[:user_id] = @user.id
+#   redirect to '/'
+# end
